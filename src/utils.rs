@@ -20,11 +20,9 @@ pub fn memzero(x: &mut [u8]) {
 /// timing attacks.
 pub fn memcmp(x: &[u8], y: &[u8]) -> bool {
     if x.len() != y.len() {
-        return false
+        return false;
     }
-    unsafe {
-        ffi::sodium_memcmp(x.as_ptr(), y.as_ptr(), x.len()) == 0
-    }
+    unsafe { ffi::sodium_memcmp(x.as_ptr(), y.as_ptr(), x.len()) == 0 }
 }
 
 /// `increment_le()` treats `x` as an unsigned little-endian number and increments it.
@@ -69,10 +67,10 @@ mod test {
     #[test]
     fn test_increment_le_zero() {
         for i in 1usize..256 {
-            let mut x = vec!(0u8; i);
+            let mut x = vec![0u8; i];
             increment_le(&mut x);
-            assert!(!x.iter().all(|x| { *x == 0 }));
-            let mut y = vec!(0u8; i);
+            assert!(!x.iter().all(|x| *x == 0));
+            let mut y = vec![0u8; i];
             y[0] += 1;
             assert_eq!(x, y);
         }
@@ -83,36 +81,36 @@ mod test {
         let mut x = [255, 2, 3, 4, 5];
         let y = [0, 3, 3, 4, 5];
         increment_le(&mut x);
-        assert!(!x.iter().all(|x| { *x == 0 }));
+        assert!(!x.iter().all(|x| *x == 0));
         assert_eq!(x, y);
         let mut x = [255, 255, 3, 4, 5];
         let y = [0, 0, 4, 4, 5];
         increment_le(&mut x);
-        assert!(!x.iter().all(|x| { *x == 0 }));
+        assert!(!x.iter().all(|x| *x == 0));
         assert_eq!(x, y);
         let mut x = [255, 255, 255, 4, 5];
         let y = [0, 0, 0, 5, 5];
         increment_le(&mut x);
-        assert!(!x.iter().all(|x| { *x == 0 }));
+        assert!(!x.iter().all(|x| *x == 0));
         assert_eq!(x, y);
         let mut x = [255, 255, 255, 255, 5];
         let y = [0, 0, 0, 0, 6];
         increment_le(&mut x);
-        assert!(!x.iter().all(|x| { *x == 0 }));
+        assert!(!x.iter().all(|x| *x == 0));
         assert_eq!(x, y);
         let mut x = [255, 255, 255, 255, 255];
         let y = [0, 0, 0, 0, 0];
         increment_le(&mut x);
-        assert!(x.iter().all(|x| { *x == 0 }));
+        assert!(x.iter().all(|x| *x == 0));
         assert_eq!(x, y);
     }
 
     #[test]
     fn test_increment_le_overflow() {
         for i in 1usize..256 {
-            let mut x = vec!(255u8; i);
+            let mut x = vec![255u8; i];
             increment_le(&mut x);
-            assert!(x.iter().all(|xi| { *xi == 0 }));
+            assert!(x.iter().all(|xi| *xi == 0));
         }
     }
 }
