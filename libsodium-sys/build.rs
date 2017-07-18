@@ -2,8 +2,8 @@
 extern crate unwrap;
 extern crate pkg_config;
 
-const VERSION: &'static str = "1.0.12";
-const MIN_VERSION: &'static str = "1.0.10";
+const VERSION: &'static str = "1.0.13";
+const MIN_VERSION: &'static str = "1.0.12";
 
 #[cfg(not(windows))]
 fn main() {
