@@ -2,7 +2,8 @@
 //! [Ed25519](http://ed25519.cr.yp.to/). This function is conjectured to meet the
 //! standard notion of unforgeability for a public-key signature scheme under
 //! chosen-message attacks.
-#[cfg(not(feature = "std"))] use prelude::*;
+#[cfg(not(feature = "std"))]
+use prelude::*;
 use ffi;
 use libc::c_ulonglong;
 use std::iter::repeat;
@@ -71,25 +72,24 @@ pub fn keypair_from_seed(&Seed(ref seed): &Seed) -> (PublicKey, SecretKey) {
     unsafe {
         let mut pk = [0u8; PUBLICKEYBYTES];
         let mut sk = [0u8; SECRETKEYBYTES];
-        ffi::crypto_sign_ed25519_seed_keypair(&mut pk,
-                                              &mut sk,
-                                              seed);
+        ffi::crypto_sign_ed25519_seed_keypair(&mut pk, &mut sk, seed);
         (PublicKey(pk), SecretKey(sk))
     }
 }
 
 /// `sign()` signs a message `m` using the signer's secret key `sk`.
 /// `sign()` returns the resulting signed message `sm`.
-pub fn sign(m: &[u8],
-            &SecretKey(ref sk): &SecretKey) -> Vec<u8> {
+pub fn sign(m: &[u8], &SecretKey(ref sk): &SecretKey) -> Vec<u8> {
     unsafe {
         let mut sm: Vec<u8> = repeat(0u8).take(m.len() + SIGNATUREBYTES).collect();
         let mut smlen = 0;
-        ffi::crypto_sign_ed25519(sm.as_mut_ptr(),
-                                 &mut smlen,
-                                 m.as_ptr(),
-                                 m.len() as c_ulonglong,
-                                 sk);
+        ffi::crypto_sign_ed25519(
+            sm.as_mut_ptr(),
+            &mut smlen,
+            m.as_ptr(),
+            m.len() as c_ulonglong,
+            sk,
+        );
         sm.truncate(smlen as usize);
         sm
     }
@@ -98,16 +98,18 @@ pub fn sign(m: &[u8],
 /// `verify()` verifies the signature in `sm` using the signer's public key `pk`.
 /// `verify()` returns the message `Ok(m)`.
 /// If the signature fails verification, `verify()` returns `Err(())`.
-pub fn verify(sm: &[u8],
-              &PublicKey(ref pk): &PublicKey) -> Result<Vec<u8>, ()> {
+pub fn verify(sm: &[u8], &PublicKey(ref pk): &PublicKey) -> Result<Vec<u8>, ()> {
     unsafe {
         let mut m: Vec<u8> = repeat(0u8).take(sm.len()).collect();
         let mut mlen = 0;
-        if ffi::crypto_sign_ed25519_open(m.as_mut_ptr(),
-                                         &mut mlen,
-                                         sm.as_ptr(),
-                                         sm.len() as c_ulonglong,
-                                         pk) == 0 {
+        if ffi::crypto_sign_ed25519_open(
+            m.as_mut_ptr(),
+            &mut mlen,
+            sm.as_ptr(),
+            sm.len() as c_ulonglong,
+            pk,
+        ) == 0
+        {
             m.truncate(mlen as usize);
             Ok(m)
         } else {
@@ -118,16 +120,17 @@ pub fn verify(sm: &[u8],
 
 /// `sign_detached()` signs a message `m` using the signer's secret key `sk`.
 /// `sign_detached()` returns the resulting signature `sig`.
-pub fn sign_detached(m: &[u8],
-                     &SecretKey(ref sk): &SecretKey) -> Signature {
+pub fn sign_detached(m: &[u8], &SecretKey(ref sk): &SecretKey) -> Signature {
     unsafe {
         let mut sig = [0u8; SIGNATUREBYTES];
         let mut siglen: c_ulonglong = 0;
-        ffi::crypto_sign_ed25519_detached(&mut sig,
-                                          &mut siglen,
-                                          m.as_ptr(),
-                                          m.len() as c_ulonglong,
-                                          sk);
+        ffi::crypto_sign_ed25519_detached(
+            &mut sig,
+            &mut siglen,
+            m.as_ptr(),
+            m.len() as c_ulonglong,
+            sk,
+        );
         assert_eq!(siglen, SIGNATUREBYTES as c_ulonglong);
         Signature(sig)
     }
@@ -136,14 +139,13 @@ pub fn sign_detached(m: &[u8],
 /// `verify_detached()` verifies the signature in `sig` against the message `m`
 /// and the signer's public key `pk`.
 /// `verify_detached()` returns true if the signature is valid, false otherwise.
-pub fn verify_detached(&Signature(ref sig): &Signature,
-                       m: &[u8],
-                       &PublicKey(ref pk): &PublicKey) -> bool {
+pub fn verify_detached(
+    &Signature(ref sig): &Signature,
+    m: &[u8],
+    &PublicKey(ref pk): &PublicKey,
+) -> bool {
     unsafe {
-        0 == ffi::crypto_sign_ed25519_verify_detached(sig,
-                                                      m.as_ptr(),
-                                                      m.len() as c_ulonglong,
-                                                      pk)
+        0 == ffi::crypto_sign_ed25519_verify_detached(sig, m.as_ptr(), m.len() as c_ulonglong, pk)
     }
 }
 
@@ -165,9 +167,7 @@ impl State {
     /// from sequential chunks of the message.
     pub fn update(&mut self, m: &[u8]) {
         unsafe {
-            ffi::crypto_sign_ed25519ph_update(&mut self.0,
-                                              m.as_ptr(),
-                                              m.len() as c_ulonglong);
+            ffi::crypto_sign_ed25519ph_update(&mut self.0, m.as_ptr(), m.len() as c_ulonglong);
         }
     }
 
@@ -179,23 +179,19 @@ impl State {
             let sig = [0u8; SIGNATUREBYTES];
             let mut siglen: c_ulonglong = 0;
 
-            ffi::crypto_sign_ed25519ph_final_create(&mut self.0,
-                                                    sig.as_ptr(),
-                                                    &mut siglen,
-                                                    sk);
+            ffi::crypto_sign_ed25519ph_final_create(&mut self.0, sig.as_ptr(), &mut siglen, sk);
             assert_eq!(siglen, SIGNATUREBYTES as c_ulonglong);
             Signature(sig)
         }
     }
 
     /// `veriry` verifies the signature in `sm` using the signer's public key `pk`.
-    pub fn verify(&mut self, &Signature(ref sig): &Signature,
-                  &PublicKey(ref pk): &PublicKey) -> bool {
-        unsafe {
-            0 == ffi::crypto_sign_ed25519ph_final_verify(&mut self.0,
-                                                         sig.as_ptr(),
-                                                         pk)
-        }
+    pub fn verify(
+        &mut self,
+        &Signature(ref sig): &Signature,
+        &PublicKey(ref pk): &PublicKey,
+    ) -> bool {
+        unsafe { 0 == ffi::crypto_sign_ed25519ph_final_verify(&mut self.0, sig.as_ptr(), pk) }
     }
 }
 
@@ -421,33 +417,29 @@ mod bench {
     use randombytes::randombytes;
     use super::*;
 
-    const BENCH_SIZES: [usize; 14] = [0, 1, 2, 4, 8, 16, 32, 64,
-                                      128, 256, 512, 1024, 2048, 4096];
+    const BENCH_SIZES: [usize; 14] = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096];
 
     #[bench]
     fn bench_sign(b: &mut test::Bencher) {
         let (_, sk) = gen_keypair();
-        let ms: Vec<Vec<u8>> = BENCH_SIZES.iter().map(|s| {
-            randombytes(*s)
-        }).collect();
-        b.iter(|| {
-            for m in ms.iter() {
-                sign(m, &sk);
-            }
+        let ms: Vec<Vec<u8>> = BENCH_SIZES.iter().map(|s| randombytes(*s)).collect();
+        b.iter(|| for m in ms.iter() {
+            sign(m, &sk);
         });
     }
 
     #[bench]
     fn bench_verify(b: &mut test::Bencher) {
         let (pk, sk) = gen_keypair();
-        let sms: Vec<Vec<u8>> = BENCH_SIZES.iter().map(|s| {
-            let m = randombytes(*s);
-            sign(&m, &sk)
-        }).collect();
-        b.iter(|| {
-            for sm in sms.iter() {
-                verify(sm, &pk);
-            }
+        let sms: Vec<Vec<u8>> = BENCH_SIZES
+            .iter()
+            .map(|s| {
+                let m = randombytes(*s);
+                sign(&m, &sk)
+            })
+            .collect();
+        b.iter(|| for sm in sms.iter() {
+            verify(sm, &pk);
         });
     }
 }

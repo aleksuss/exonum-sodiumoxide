@@ -88,9 +88,7 @@ mod prelude {
 ///
 /// `init()` returns `false` if initialization failed.
 pub fn init() -> bool {
-    unsafe {
-        ffi::sodium_init() != -1
-    }
+    unsafe { ffi::sodium_init() != -1 }
 }
 
 #[macro_use]
