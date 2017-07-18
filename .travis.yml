@@ -5,7 +5,6 @@ rust:
 
 cache: cargo
 sudo: required
-group: deprecated-2017Q2
 dist: trusty
 
 before_install:
