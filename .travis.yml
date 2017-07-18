@@ -18,6 +18,7 @@ install:
 - sudo apt-get -qq --yes install gcc g++ make libsodium-dev libssl-dev
 
 script:
+- cargo build
 - cargo audit
 - cargo test
 
