@@ -46,7 +46,7 @@
 //!  `crypto::verify`
 //!
 //!  `crypto::shorthash`
-#![crate_name = "exonum_sodiumoxide"]
+#![crate_name = "sodiumoxide"]
 #![crate_type = "lib"]
 #![warn(missing_docs)]
 #![warn(non_upper_case_globals)]

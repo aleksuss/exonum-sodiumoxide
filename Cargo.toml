@@ -4,14 +4,14 @@ description = "Fast cryptographic library for Rust (bindings to libsodium)"
 documentation = "https://dnaq.github.io/sodiumoxide"
 keywords = ["crypto", "NaCl", "libsodium"]
 license = "MIT OR Apache-2.0"
-name = "exonum_sodiumoxide"
+name = "sodiumoxide"
 readme = "README.md"
 repository = "https://github.com/exonum/exonum-sodiumoxide"
 version = "0.0.14"
 
 [dependencies]
 libc = "0.2"
-libsodium-sys = { version = "0.0.14", path = "libsodium-sys" }
+exonum_libsodium_sys = { version = "0.0.14", path = "libsodium-sys" }
 serde = { version="1", optional = true }
 
 [dev-dependencies]

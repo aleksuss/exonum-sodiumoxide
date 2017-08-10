@@ -1,13 +1,13 @@
 [package]
-authors = ["dnaq"]
+authors = ["dnaq", "The Exonum Team <exonum@bitfury.com>"]
 build = "build.rs"
 description = "FFI binding to libsodium"
 documentation = "https://dnaq.github.io/sodiumoxide"
 keywords = ["libsodium", "NaCl", "crypto"]
 license = "MIT OR Apache-2.0"
 links = "sodium"
-name = "libsodium-sys"
-repository = "https://github.com/dnaq/sodiumoxide.git"
+name = "exonum_libsodium_sys"
+repository = "https://github.com/exonum/exonum-sodiumoxide"
 version = "0.0.14"
 
 [build-dependencies]
