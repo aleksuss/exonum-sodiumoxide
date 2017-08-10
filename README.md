@@ -62,7 +62,7 @@ File bugs in the issue tracker
 
 Master git repository
 
-    git clone https://github.com/dnaq/sodiumoxide.git
+    git clone https://github.com/exonum/exonum-sodiumoxide.git
 
 License
 -------

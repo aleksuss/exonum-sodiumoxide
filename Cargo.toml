@@ -1,12 +1,12 @@
 [package]
-authors = ["dnaq"]
+authors = ["dnaq", "The Exonum Team <exonum@bitfury.com>"]
 description = "Fast cryptographic library for Rust (bindings to libsodium)"
 documentation = "https://dnaq.github.io/sodiumoxide"
 keywords = ["crypto", "NaCl", "libsodium"]
 license = "MIT OR Apache-2.0"
-name = "sodiumoxide"
+name = "exonum_sodiumoxide"
 readme = "README.md"
-repository = "https://github.com/dnaq/sodiumoxide"
+repository = "https://github.com/exonum/exonum-sodiumoxide"
 version = "0.0.14"
 
 [dependencies]
